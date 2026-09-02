@@ -12,12 +12,12 @@ class PlayerTest {
 
 	private Player player;
 	
-	private final BriscolaCard assoDenari = new BriscolaCard(1, Suit.DENARI);  // 11 pt
-    private final BriscolaCard treCoppe = new BriscolaCard(3, Suit.COPPE);      // 10 pt
-    private final BriscolaCard dueBastoni = new BriscolaCard(2, Suit.BASTONI);  // 0 pt
+	private final BriscolaCard assoDenari = new BriscolaCard(1, ItalianSuit.DENARI);  // 11 pt
+    private final BriscolaCard treCoppe = new BriscolaCard(3, ItalianSuit.COPPE);      // 10 pt
+    private final BriscolaCard dueBastoni = new BriscolaCard(2, ItalianSuit.BASTONI);  // 0 pt
 	
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		//dummy strategy: estrae sempre la prima
 		player = new Player("Silvio", (a,b,c)->0);
 	}
@@ -82,7 +82,7 @@ class PlayerTest {
         customPlayer.receiveCard(treCoppe);
         
         //non ci sono carte sul tavolo, quindi tableCard = null
-        BriscolaCard played = customPlayer.playCard(null, Suit.DENARI);
+        BriscolaCard played = customPlayer.playCard(null, ItalianSuit.DENARI);
 
         assertThat(played).isEqualTo(treCoppe);
         assertThat(customPlayer.getHand())
@@ -91,7 +91,7 @@ class PlayerTest {
 	
 	@Test
 	void testPlayCardEmptyHandThrowException() {
-		assertThatThrownBy(() -> player.playCard(null, Suit.DENARI))
+		assertThatThrownBy(() -> player.playCard(null, ItalianSuit.DENARI))
 	        .isInstanceOf(IllegalStateException.class)
 	        .hasMessageContaining("Impossibile giocare! Mano vuota!");
 	}
@@ -102,8 +102,9 @@ class PlayerTest {
         Player badPlayer = new Player("BadPlayer", invalidStrategy);
         badPlayer.receiveCard(assoDenari);
 
-        assertThatThrownBy(() -> badPlayer.playCard(null, Suit.DENARI))
-                .isInstanceOf(IndexOutOfBoundsException.class);
+        assertThatThrownBy(() -> badPlayer.playCard(null, ItalianSuit.DENARI))
+                .isInstanceOf(IndexOutOfBoundsException.class)
+				.hasMessage("Indice non valido!");
 	}
 
 	@Test
@@ -114,7 +115,7 @@ class PlayerTest {
         	.isEqualTo(21);
 
         player.collectCards(dueBastoni,
-        		new BriscolaCard(10, Suit.SPADE)); // 0 + 4 = 4 pt
+        		new BriscolaCard(10, ItalianSuit.SPADE)); // 0 + 4 = 4 pt
         
         assertThat(player.getScore())
         	.isEqualTo(25);

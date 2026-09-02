@@ -18,7 +18,7 @@ class BriscolaMatchTest {
     private BriscolaMatch match;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		PlayStrategy firstCardStrategy = (hand, tableCard, briscola) -> 0;
         p1 = new Player("Giocatore 1", firstCardStrategy);
         p2 = new Player("Giocatore 2", firstCardStrategy);
@@ -51,6 +51,24 @@ class BriscolaMatchTest {
         assertThat(match.getRemainingCardsInDeck()).isEqualTo(34);
         assertThat(match.isGameOver()).isFalse();	
     }
+
+    @Test
+    void newMatchIsNotStarted() {
+        assertThat(match.isGameOver()).isFalse();
+    }
+
+    @Test
+    void cannotPlayRoundBeforeStart() {
+        assertThatThrownBy(() -> match.playRound())
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void matchIsInProgressAfterStart() {
+        match.startMatch();
+
+        assertThat(match.isGameOver()).isFalse();
+    }
 	
 	
 	@Test
@@ -79,7 +97,7 @@ class BriscolaMatchTest {
 	}
 	
 	@Test
-	void testPlayRoundAfterMatchThrowException() {
+	void testPlayRoundAfterMatchFinishedThrowException() {
 		match.startMatch();
         while (!match.isGameOver()) {
             match.playRound();
@@ -87,8 +105,19 @@ class BriscolaMatchTest {
 
         assertThatThrownBy(match::playRound)
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Partita terminata");
+                .hasMessageContaining("La partita non è in corso.");
     
 	}
+	@Test
+	void testStartMatchWhileRunningThrowException() {
+		match.startMatch();
+
+        assertThatThrownBy(match::startMatch)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("La partita è già in corso.");
+
+	}
+
+
 
 }

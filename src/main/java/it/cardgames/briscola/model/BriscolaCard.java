@@ -1,6 +1,6 @@
 package it.cardgames.briscola.model;
 
-public record BriscolaCard(int rank, Suit suit) {
+public record BriscolaCard(int rank, ItalianSuit suit) {
 	
 	public BriscolaCard {
         if (rank < 1 || rank > 10) {

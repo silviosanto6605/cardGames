@@ -3,7 +3,7 @@ package it.cardgames.briscola.strategy;
 import java.util.List;
 
 import it.cardgames.briscola.model.BriscolaCard;
-import it.cardgames.briscola.model.Suit;
+import it.cardgames.briscola.model.ItalianSuit;
 
 @FunctionalInterface
 public interface PlayStrategy {
@@ -14,6 +14,6 @@ public interface PlayStrategy {
 	 * @param briscolaSuit the briscola suit
 	 * @return the index of the card chosen
 	 */
-	int chooseCard(List<BriscolaCard> hand, BriscolaCard tableCard, Suit briscolaSuit);
+	int chooseCard(List<BriscolaCard> hand, BriscolaCard tableCard, ItalianSuit briscolaSuit);
 	
 }

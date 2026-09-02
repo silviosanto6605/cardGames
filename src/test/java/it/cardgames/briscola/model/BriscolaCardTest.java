@@ -9,9 +9,9 @@ class BriscolaCardTest {
 
 	@Test
 	void testBriscolaCardConstructorValid() {
-		BriscolaCard card = new BriscolaCard(10, Suit.SPADE);
+		BriscolaCard card = new BriscolaCard(10, ItalianSuit.SPADE);
 		assertThat(card.suit())
-			.isEqualTo(Suit.SPADE);
+			.isEqualTo(ItalianSuit.SPADE);
 		assertThat(card.rank())
 			.isEqualTo(10);
 	}
@@ -19,7 +19,7 @@ class BriscolaCardTest {
 	@Test
 	void testBriscolaCardInvalidRank() {
 		assertThatThrownBy(
-				() -> {new BriscolaCard(-1, Suit.SPADE);}
+				() -> {new BriscolaCard(-1, ItalianSuit.SPADE);}
 				).isInstanceOf(IllegalArgumentException.class)
 		.hasMessage("Il valore della carta deve essere tra 1 e 10. Ricevuto: -1");
 	}
@@ -35,14 +35,14 @@ class BriscolaCardTest {
 
 	@Test
 	void testGetRankName() {
-		BriscolaCard card = new BriscolaCard(10, Suit.SPADE);
+		BriscolaCard card = new BriscolaCard(10, ItalianSuit.SPADE);
 		assertThat(card.getRankName())
 			.isEqualTo("Re");
 
 	}	
 	@Test
 	void testToString() {
-		BriscolaCard card = new BriscolaCard(10, Suit.SPADE);
+		BriscolaCard card = new BriscolaCard(10, ItalianSuit.SPADE);
 		assertThat(card.toString())
 			.isEqualTo("Re di SPADE");
 

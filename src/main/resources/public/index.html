@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Briscola Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+    <header>
+        <div id="scoreboard">
+            <span>Tu: <strong id="my-score">0</strong> pt</span>
+            <span id="deck-info">Tallone: <strong id="deck-count">40</strong> carte</span>
+            <span>Avversario: <strong id="opp-score">0</strong> pt</span>
+        </div>
+        <div id="status-bar">In attesa di un altro giocatore...</div>
+    </header>
+
+    <main id="table">
+        <div id="side-deck">
+            <div id="briscola-card" class="card briscola">?</div>
+            <div id="deck-pile" class="card back">Mazzo</div>
+        </div>
+
+        <div id="play-area">
+            <div id="table-card" class="card empty">Nessuna carta</div>
+        </div>
+    </main>
+
+    <footer>
+        <h3>La tua mano</h3>
+        <div id="hand-container">
+        </div>
+    </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 package it.cardgames.briscola.model;
 
-public enum Suit {
+public enum ItalianSuit {
 	
 	BASTONI,COPPE,DENARI,SPADE
 }

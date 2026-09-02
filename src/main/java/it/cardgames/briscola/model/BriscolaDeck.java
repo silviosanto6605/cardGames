@@ -7,17 +7,17 @@ import java.util.Optional;
 
 public class BriscolaDeck {
 	
-	private List<BriscolaCard> cards = new ArrayList<BriscolaCard>(40); 
+	private final List<BriscolaCard> cards = new ArrayList<>(40);
 	
 	public BriscolaDeck() {
 		reset();
 	}
 
 	public void reset() {
-		getCards().clear();
-		for (Suit suit : Suit.values()) {
+		cards.clear();
+		for (ItalianSuit suit : ItalianSuit.values()) {
 			for (int i = 1; i <= 10; i++) {
-				getCards().add(new BriscolaCard(i, suit));
+				cards.add(new BriscolaCard(i, suit));
 			}
 		}
 	}

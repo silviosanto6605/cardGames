@@ -6,17 +6,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
 import it.cardgames.briscola.model.BriscolaCard;
-import it.cardgames.briscola.model.Suit;
+import it.cardgames.briscola.model.ItalianSuit;
 
 class BriscolaRuleEngineTest {
 
 
-	private BriscolaCard card1 = new BriscolaCard(10, Suit.SPADE); // 4pt, potenza 8
-	private BriscolaCard card2 = new BriscolaCard(9, Suit.BASTONI); // 3pt, potenza 7
-	private BriscolaCard card3 = new BriscolaCard(8, Suit.BASTONI); // 2pt, potenza 6
-	private BriscolaCard card4 = new BriscolaCard(1, Suit.DENARI); // 11pt, potenza 10
-	private BriscolaCard card5 = new BriscolaCard(3, Suit.COPPE); // 10pt, potenza 9
-	private BriscolaCard card6 = new BriscolaCard(2, Suit.COPPE); // 0pt, potenza 1
+	private final BriscolaCard card1 = new BriscolaCard(10, ItalianSuit.SPADE); // 4pt, potenza 8
+	private final BriscolaCard card2 = new BriscolaCard(9, ItalianSuit.BASTONI); // 3pt, potenza 7
+	private final BriscolaCard card3 = new BriscolaCard(8, ItalianSuit.BASTONI); // 2pt, potenza 6
+	private final BriscolaCard card4 = new BriscolaCard(1, ItalianSuit.DENARI); // 11pt, potenza 10
+	private final BriscolaCard card5 = new BriscolaCard(3, ItalianSuit.COPPE); // 10pt, potenza 9
+	private final BriscolaCard card6 = new BriscolaCard(2, ItalianSuit.COPPE); // 0pt, potenza 1
 
 
 	@Test
@@ -82,16 +82,16 @@ class BriscolaRuleEngineTest {
 		// stesso seme , non di briscola -> vince + alta
 		assertThat(
 				BriscolaRuleEngine.evalWinning(
-						new BriscolaCard(5, Suit.BASTONI),
-						new BriscolaCard(7, Suit.BASTONI),
-						Suit.COPPE)
+						new BriscolaCard(5, ItalianSuit.BASTONI),
+						new BriscolaCard(7, ItalianSuit.BASTONI),
+						ItalianSuit.COPPE)
 				).isEqualTo(1);
 
 		assertThat(
 				BriscolaRuleEngine.evalWinning(
-						new BriscolaCard(7, Suit.BASTONI),
-						new BriscolaCard(5, Suit.BASTONI),
-						Suit.COPPE)
+						new BriscolaCard(7, ItalianSuit.BASTONI),
+						new BriscolaCard(5, ItalianSuit.BASTONI),
+						ItalianSuit.COPPE)
 				).isEqualTo(0);
 	}
 
@@ -100,9 +100,9 @@ class BriscolaRuleEngineTest {
 		// stesso seme, di briscola -> vince + alta
 		assertThat(
 				BriscolaRuleEngine.evalWinning(
-						new BriscolaCard(3, Suit.BASTONI),
-						new BriscolaCard(5, Suit.BASTONI),
-						Suit.BASTONI)
+						new BriscolaCard(3, ItalianSuit.BASTONI),
+						new BriscolaCard(5, ItalianSuit.BASTONI),
+						ItalianSuit.BASTONI)
 				).isEqualTo(0);
 	}
 
@@ -112,16 +112,16 @@ class BriscolaRuleEngineTest {
 		// seme briscola vs non briscola -> vince briscola
 		assertThat(
 				BriscolaRuleEngine.evalWinning(
-						new BriscolaCard(5, Suit.BASTONI),
-						new BriscolaCard(7, Suit.COPPE),
-						Suit.BASTONI)
+						new BriscolaCard(5, ItalianSuit.BASTONI),
+						new BriscolaCard(7, ItalianSuit.COPPE),
+						ItalianSuit.BASTONI)
 				).isEqualTo(0);
 
 		assertThat(
 				BriscolaRuleEngine.evalWinning(
-						new BriscolaCard(7, Suit.COPPE),
-						new BriscolaCard(5, Suit.BASTONI),
-						Suit.BASTONI)
+						new BriscolaCard(7, ItalianSuit.COPPE),
+						new BriscolaCard(5, ItalianSuit.BASTONI),
+						ItalianSuit.BASTONI)
 				).isEqualTo(1);
 
 	}
@@ -132,9 +132,9 @@ class BriscolaRuleEngineTest {
 		// semi diversi, non briscola -> vince primo
 		assertThat(
 				BriscolaRuleEngine.evalWinning(
-						new BriscolaCard(5, Suit.BASTONI),
-						new BriscolaCard(7, Suit.COPPE),
-						Suit.DENARI)
+						new BriscolaCard(5, ItalianSuit.BASTONI),
+						new BriscolaCard(7, ItalianSuit.COPPE),
+						ItalianSuit.DENARI)
 				).isEqualTo(0);
 
 	}

@@ -1,7 +1,7 @@
 package it.cardgames.briscola.engine;
 
 import it.cardgames.briscola.model.BriscolaCard;
-import it.cardgames.briscola.model.Suit;
+import it.cardgames.briscola.model.ItalianSuit;
 
 public class BriscolaRuleEngine {
 
@@ -43,7 +43,7 @@ public class BriscolaRuleEngine {
     /**
      * @return 0 se prende la prima carta (leadCard), 1 se prende la seconda (followCard)
      */
-    public static int evalWinning(BriscolaCard leadCard, BriscolaCard followCard, Suit briscolaSuit) {
+    public static int evalWinning(BriscolaCard leadCard, BriscolaCard followCard, ItalianSuit briscolaSuit) {
         if (leadCard == null || followCard == null || briscolaSuit == null) {
             throw new IllegalArgumentException("Carte o semi null non ammessi!");
         }

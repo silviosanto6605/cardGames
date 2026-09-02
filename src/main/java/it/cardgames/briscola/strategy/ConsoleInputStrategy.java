@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import it.cardgames.briscola.model.BriscolaCard;
-import it.cardgames.briscola.model.Suit;
+import it.cardgames.briscola.model.ItalianSuit;
 
 public class ConsoleInputStrategy implements PlayStrategy {
 	
@@ -19,7 +19,7 @@ public class ConsoleInputStrategy implements PlayStrategy {
 
 
 	@Override
-	public int chooseCard(List<BriscolaCard> hand, BriscolaCard tableCard, Suit briscolaSuit) {
+	public int chooseCard(List<BriscolaCard> hand, BriscolaCard tableCard, ItalianSuit briscolaSuit) {
 		System.out.println("\n----------------------------------------");
         System.out.println("Seme di Briscola regnante: " + briscolaSuit);
 
