@@ -13,7 +13,7 @@ public class BriscolaDeck {
 		reset();
 	}
 
-	private void reset() {
+	public void reset() {
 		getCards().clear();
 		for (Suit suit : Suit.values()) {
 			for (int i = 1; i <= 10; i++) {
