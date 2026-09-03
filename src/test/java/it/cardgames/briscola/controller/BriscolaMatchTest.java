@@ -64,6 +64,18 @@ class BriscolaMatchTest {
     }
 
     @Test
+    void testCannotRestartFinishedMatch() {
+        match.startMatch();
+        while (!match.isGameOver()) {
+            match.playRound();
+        }
+
+        assertThatThrownBy(match::startMatch)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("La partita è terminata. Crea una nuova partita per rigiocare.");
+    }
+
+    @Test
     void matchIsInProgressAfterStart() {
         match.startMatch();
 

@@ -35,6 +35,9 @@ public class BriscolaMatch {
         if (state == MatchState.IN_PROGRESS) {
             throw new IllegalStateException("La partita è già in corso.");
         }
+        if (state == MatchState.FINISHED) {
+            throw new IllegalStateException("La partita è terminata. Crea una nuova partita per rigiocare.");
+        }
 
         deck.reset();
         deck.shuffle();
@@ -92,7 +95,10 @@ public class BriscolaMatch {
                 (leaderIndex == 0) ? player2 : player1;
 
         BriscolaCard leadCard =
-                leadPlayer.playCard(null, getBriscolaSuit());
+                leadPlayer.playCard(
+                        null,
+                        getBriscolaSuit()
+                );
 
         BriscolaCard followCard =
                 followPlayer.playCard(

@@ -12,6 +12,7 @@ public class WebPlayerStrategy implements PlayStrategy {
 
     private CompletableFuture<Integer> pendingMove;
     private Consumer<BriscolaCard> onTurnRequest;
+    private volatile List<BriscolaCard> currentHand;
 
     public void setOnTurnRequest(Consumer<BriscolaCard> onTurnRequest) {
         this.onTurnRequest = onTurnRequest;
@@ -19,22 +20,36 @@ public class WebPlayerStrategy implements PlayStrategy {
 
     @Override
     public int chooseCard(List<BriscolaCard> hand, BriscolaCard tableCard, ItalianSuit briscolaSuit) {
+        this.currentHand = hand;
+        this.pendingMove = new CompletableFuture<>();
+
         if (onTurnRequest != null) {
             onTurnRequest.accept(tableCard);
         }
 
-        pendingMove = new CompletableFuture<>();
         try {
             return pendingMove.get();
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Attesa mossa interrotta", e);
+            throw new IllegalStateException("Attesa mossa interrotta o client disconnesso", e);
+        } finally {
+            this.currentHand = null;
         }
     }
 
-    public void submitMove(int cardIndex){
-        if (pendingMove != null && !pendingMove.isDone()){
-            pendingMove.complete(cardIndex);
+    public synchronized boolean submitMove(int cardIndex) {
+        if (pendingMove != null && !pendingMove.isDone() && currentHand != null) {
+            if (cardIndex >= 0 && cardIndex < currentHand.size()) {
+                pendingMove.complete(cardIndex);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public synchronized void abortMatch(String reason) {
+        if (pendingMove != null && !pendingMove.isDone()) {
+            pendingMove.completeExceptionally(new IllegalStateException(reason));
         }
     }
 }

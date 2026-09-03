@@ -19,6 +19,7 @@ public class Main {
 
     private static final Queue<WsContext> waitingPlayers = new ConcurrentLinkedQueue<>();
     private static final Map<String, WebPlayerStrategy> playerStrategies = new ConcurrentHashMap<>();
+    private static final Map<String, WsContext> opponentMap = new ConcurrentHashMap<>();
 
     public static void main(String[] args) {
         Javalin app = Javalin.create(config -> {
@@ -48,8 +49,20 @@ public class Main {
             ws.onClose(ctx -> {
                 System.out.println("Disconnesso: " + ctx.sessionId());
                 waitingPlayers.remove(ctx);
-                playerStrategies.remove(ctx.sessionId());
+
+                WebPlayerStrategy strategy = playerStrategies.remove(ctx.sessionId());
+                if (strategy != null) {
+                    strategy.abortMatch("Il giocatore si è disconnesso.");
+                }
+
+                WsContext oppCtx = opponentMap.remove(ctx.sessionId());
+                if (oppCtx != null && oppCtx.session.isOpen()) {
+                    opponentMap.remove(oppCtx.sessionId());
+                    playerStrategies.remove(oppCtx.sessionId());
+                    sendDisconnectNotice(oppCtx, "L'avversario si è disconnesso. Partita terminata.");
+                }
             });
+
         });
 
         app.start(8080);
@@ -78,13 +91,13 @@ public class Main {
             BriscolaMatch match = new BriscolaMatch(player1, player2, new BriscolaDeck());
 
             strat1.setOnTurnRequest(tableCard -> {
-                sendState(p1Ctx, match, true, tableCard, "È il tuo turno!");
-                sendState(p2Ctx, match, false, tableCard, "In attesa dell'avversario...");
+                sendState(p1Ctx, match, true, tableCard, null, null, "È il tuo turno!");
+                sendState(p2Ctx, match, false, tableCard, null, null, "In attesa dell'avversario...");
             });
 
             strat2.setOnTurnRequest(tableCard -> {
-                sendState(p2Ctx, match, true, tableCard, "È il tuo turno!");
-                sendState(p1Ctx, match, false, tableCard, "In attesa dell'avversario...");
+                sendState(p2Ctx, match, true, tableCard, null, null, "È il tuo turno!");
+                sendState(p1Ctx, match, false, tableCard, null, null, "In attesa dell'avversario...");
             });
 
             System.out.println("Partita avviata tra " + p1Ctx.sessionId() + " e " + p2Ctx.sessionId());
@@ -93,47 +106,103 @@ public class Main {
     }
 
     private static void gameLoop(BriscolaMatch match, WsContext p1, WsContext p2, Player player1, Player player2) {
-        match.startMatch();
+        try {
+            match.startMatch();
 
-        while (!match.isGameOver()) {
-            var roundResult = match.playRound();
+            while (!match.isGameOver()) {
+                var roundResult = match.playRound();
 
-            String resMsg = "Presa vinta da " + roundResult.winner().getName() + " (+" + roundResult.pointsWon() + " pt)";
-            sendState(p1, match, false, roundResult.followCard(), resMsg);
-            sendState(p2, match, false, roundResult.followCard(), resMsg);
+                String resMsg = "Presa di " + roundResult.winner().getName() + " (+" + roundResult.pointsWon() + " pt)";
 
-            try {
-                Thread.sleep(2500);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
+                sendRoundResult(p1, match, roundResult.leadCard(), roundResult.followCard(), roundResult.winner() == player1, resMsg);
+                sendRoundResult(p2, match, roundResult.leadCard(), roundResult.followCard(), roundResult.winner() == player2, resMsg);
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
             }
-        }
 
-        Player winner = match.getWinner();
-        String endMsg = (winner != null) ? "Vincitore: " + winner.getName() + "!" : "Pareggio!";
-        sendState(p1, match, false, null, "Partita finita! " + endMsg);
-        sendState(p2, match, false, null, "Partita finita! " + endMsg);
+            if (match.isGameOver()) {
+                Player winner = match.getWinner();
+                String endMsg = (winner != null) ? "Vincitore: " + winner.getName() + "!" : "Pareggio!";
+                sendState(p1, match, false, null, null, null, "Partita finita! " + endMsg);
+                sendState(p2, match, false, null, null, null, "Partita finita! " + endMsg);
+            }
+        } catch (Exception e) {
+            System.err.println("Partita interrotta anomala: " + e.getMessage());
+        } finally {
+            playerStrategies.remove(p1.sessionId());
+            playerStrategies.remove(p2.sessionId());
+            opponentMap.remove(p1.sessionId());
+            opponentMap.remove(p2.sessionId());
+        }
     }
 
-    private static void sendState(WsContext ctx, BriscolaMatch match, boolean isTurn, BriscolaCard tableCard, String msg) {
+    private static void sendState(WsContext ctx, BriscolaMatch match, boolean isTurn, BriscolaCard firstCard, BriscolaCard secondCard, Boolean wonByMe, String msg) {
         if (ctx.session.isOpen()) {
-
             Player me = ctx.attribute("player");
             Player opponent = ctx.attribute("opponent");
 
             ServerStateDto dto = new ServerStateDto(
                     "UPDATE",
                     me.getHand(),
-                    tableCard,
+                    firstCard,
+                    secondCard,
                     match.getGroundBriscola(),
                     match.getRemainingCardsInDeck(),
                     me.getScore(),
                     opponent.getScore(),
                     isTurn,
+                    wonByMe,
                     msg
             );
             ctx.send(dto);
         }
     }
+
+    private static void sendDisconnectNotice(WsContext ctx, String msg) {
+        if (ctx.session.isOpen()) {
+            Player me = ctx.attribute("player");
+            ServerStateDto dto = new ServerStateDto(
+                    "DISCONNECT",
+                    me != null ? me.getHand() : java.util.List.<BriscolaCard>of(),
+                    null,
+                    null,
+                    null,
+                    0,
+                    me != null ? me.getScore() : 0,
+                    0,
+                    false,
+                    null,
+                    msg
+            );
+            ctx.send(dto);
+        }
+    }
+
+    private static void sendRoundResult(WsContext ctx, BriscolaMatch match, BriscolaCard firstCard, BriscolaCard secondCard, boolean wonByMe, String msg) {
+        if (ctx.session.isOpen()) {
+            Player me = ctx.attribute("player");
+            Player opponent = ctx.attribute("opponent");
+
+            ServerStateDto dto = new ServerStateDto(
+                    "ROUND_OVER",
+                    me.getHand(),
+                    firstCard,
+                    secondCard,
+                    match.getGroundBriscola(),
+                    match.getRemainingCardsInDeck(),
+                    me.getScore(),
+                    opponent.getScore(),
+                    false,
+                    wonByMe,
+                    msg
+            );
+            ctx.send(dto);
+        }
+    }
+
 }

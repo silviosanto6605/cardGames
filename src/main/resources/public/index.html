@@ -17,21 +17,31 @@
         <div id="status-bar">In attesa di un altro giocatore...</div>
     </header>
 
+    <div id="opp-taken-pile" class="card pile hidden">
+        <img src="/cards/napol/retro.jpg" alt="Prese Avversario" class="card-img">
+    </div>
+
     <main id="table">
         <div id="side-deck">
-            <div id="briscola-card" class="card briscola">?</div>
-            <div id="deck-pile" class="card back">Mazzo</div>
+            <div id="briscola-card" class="card briscola"></div>
+            <div id="deck-pile" class="card back">
+                <img src="/cards/napol/retro.jpg" alt="Mazzo" class="card-img">
+            </div>
         </div>
 
         <div id="play-area">
-            <div id="table-card" class="card empty">Nessuna carta</div>
+            <div id="table-card-1" class="card empty">-</div>
+            <div id="table-card-2" class="card empty">-</div>
         </div>
     </main>
 
+    <div id="my-taken-pile" class="card pile hidden">
+        <img src="/cards/napol/retro.jpg" alt="Le tue Prese" class="card-img">
+    </div>
+
     <footer>
         <h3>La tua mano</h3>
-        <div id="hand-container">
-        </div>
+        <div id="hand-container"></div>
     </footer>
 </div>
 
